@@ -1,3 +1,43 @@
+# 인공지능과 금융공학 Final Project
+
+이 repository는 한국투자증권 Open API 공식 sample repository를 fork한 뒤, 인공지능과 금융공학 Final Project 제출을 위해 수정한 repository입니다.
+
+## 제출 프로젝트 1: 자동매매 시스템
+
+자동매매 시스템 구현 내용은 아래 폴더에 정리되어 있습니다.
+
+[final_project/kis_auto_trading](./final_project/kis_auto_trading)
+
+상세 README는 아래 링크에서 확인할 수 있습니다.
+
+[자동매매 시스템 상세 README](./final_project/kis_auto_trading/README.md)
+
+## 자동매매 시스템 현재 구현 상태
+
+현재까지 구현 및 확인한 내용은 다음과 같습니다.
+
+- Postman을 이용한 한국투자증권 Open API 연결 테스트 완료
+- Python 코드로 OAuth access token 발급 성공
+- Python 코드로 국내주식 현재가 조회 성공
+- Python 코드로 모의투자 계좌 잔고 조회 성공
+- 모의계좌 예수금 10,000,000원 확인
+- API 요청 제한 오류 해결 과정 기록
+- 계좌번호 입력 형식 오류 해결 과정 기록
+- README에 실행 결과와 코드 작동 과정 정리 중
+
+## 보안 관련 안내
+
+실제 API Key, API Secret, access token, 계좌번호는 `.env` 파일에 저장하며 GitHub에는 업로드하지 않습니다.
+
+GitHub에는 환경변수 형식만 확인할 수 있는 `.env.example` 파일만 포함합니다.
+
+---
+
+# 기존 한국투자증권 Open API sample repository 안내
+
+아래 내용은 fork한 원본 repository의 기존 README 내용입니다.
+
+---
 **[당사에서 제공하는 샘플코드에 대한 유의사항]**
 
 - 샘플 코드는 한국투자증권 Open API(KIS Developers)를 연동하는 예시입니다. 고객님의 개발 부담을 줄이고자 참고용으로 제공되고 있습니다.
