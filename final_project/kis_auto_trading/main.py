@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from kis_api import KISApiClient
 from strategy import analyze_moving_average_strategy
@@ -7,7 +8,25 @@ from logger import save_trading_log, print_log_saved_message
 
 
 DRY_RUN = True
-FORCE_TEST_BUY_SIGNAL = False
+
+# None: 실제 전략 결과 사용
+# "BUY": 매수 흐름 테스트
+# "SELL": 매도 흐름 테스트
+# "HOLD": 주문 차단 흐름 테스트
+
+# ---------------------------------------------------------
+# Loop Settings
+# ---------------------------------------------------------
+# True이면 main.py의 이동평균선 자동매매 흐름을 반복 실행한다.
+LOOP_MODE = True
+
+# 몇 번 반복할지 설정한다.
+MAX_CYCLES = 10
+
+# 반복 사이 대기 시간
+LOOP_INTERVAL_SECONDS = 60
+
+FORCE_TEST_SIGNAL = None
 
 def print_current_price(price_data: dict) -> None:
     output = price_data["output"]
@@ -120,11 +139,14 @@ def main() -> None:
     strategy_result = analyze_moving_average_strategy(daily_price_data)
     print_strategy_result(strategy_result)
 
-    if FORCE_TEST_BUY_SIGNAL:
-        print("\n[테스트 모드] DRY_RUN 주문 흐름 확인을 위해 BUY 신호를 강제로 적용합니다.")
-        strategy_result["signal"] = "BUY"
+    if FORCE_TEST_SIGNAL is not None:
+        print("\n[TEST MODE] Strategy signal is manually overridden.")
+        print(f"original signal: {strategy_result['signal']}")
+        print(f"forced signal: {FORCE_TEST_SIGNAL}")
+
+        strategy_result["signal"] = FORCE_TEST_SIGNAL
         strategy_result["reason"] = (
-            "DRY_RUN 주문 흐름 테스트를 위해 BUY 신호를 강제로 적용했습니다. "
+            f"테스트를 위해 {FORCE_TEST_SIGNAL} 신호를 강제로 적용했습니다. "
             "실제 전략 신호가 아니라 테스트용 신호입니다."
         )
 
@@ -212,5 +234,40 @@ def main() -> None:
     print("\n5차 거래 기록 저장 테스트 완료")
 
 
+def run_loop() -> None:
+    print("KIS 이동평균선 자동매매 loop 실행을 시작합니다.")
+    print(f"LOOP_MODE: {LOOP_MODE}")
+    print(f"DRY_RUN: {DRY_RUN}")
+    print(f"FORCE_TEST_SIGNAL: {FORCE_TEST_SIGNAL}")
+    print(f"MAX_CYCLES: {MAX_CYCLES}")
+    print(f"LOOP_INTERVAL_SECONDS: {LOOP_INTERVAL_SECONDS}")
+
+    for cycle in range(1, MAX_CYCLES + 1):
+        print("\n" + "=" * 60)
+        print(f"[Loop Cycle {cycle}] {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 60)
+
+        try:
+            main()
+
+        except KeyboardInterrupt:
+            print("\n사용자가 프로그램을 중단했습니다.")
+            break
+
+        except Exception as e:
+            print("\n자동매매 실행 중 오류가 발생했습니다.")
+            print(f"error: {e}")
+            print("오류가 발생했지만 loop는 중단하지 않고 다음 cycle로 넘어갑니다.")
+
+        if cycle < MAX_CYCLES:
+            print(f"\n다음 cycle까지 {LOOP_INTERVAL_SECONDS}초 대기합니다.")
+            time.sleep(LOOP_INTERVAL_SECONDS)
+
+    print("\nKIS 이동평균선 자동매매 loop 실행이 종료되었습니다.")
+
+
 if __name__ == "__main__":
-    main()
+    if LOOP_MODE:
+        run_loop()
+    else:
+        main()
